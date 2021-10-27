@@ -1,3 +1,5 @@
 Rails.application.routes.draw do
-  root 'homes#index'
+  root 'posts#index'
+
+  resources :posts, except: :index
 end
