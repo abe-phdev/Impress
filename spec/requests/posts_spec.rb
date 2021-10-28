@@ -1,6 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe "Posts", type: :request do
+
+  describe "GET/index" do
+    let!(:posts) { create_list(:post, 10) }
+    it "displays all the list of posts" do
+      get "/"
+      expect(assigns(:posts)).to eq posts
+    end
+  end
+
   describe "/posts/new" do
     it 'succeeds' do
       get new_post_path
