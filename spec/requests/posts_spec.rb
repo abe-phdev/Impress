@@ -13,34 +13,39 @@ RSpec.describe "Posts", type: :request do
   describe "/posts/new" do
     it 'succeeds' do
       get new_post_path
+      expect(response).to render_template(:new)
       expect(response.status).to eq 200
     end
   end
 
   describe "/posts/create" do
-    let(:params) do {
-      post: {
-        title: "Sample Title",
-        body: "Sample post body."
+    def create_post(title, body)
+      post posts_path, params: {
+        post: {
+          title: title,
+          body: body
+        }
       }
-    }
     end
 
     context "with valid params" do
-      subject { post posts_path, params: params }
+      let(:title) { "Sample Title" }
+      let(:body) { "Sample body" }
 
       it 'create a post' do
-        expect{ subject }.to change { Post.count }.by(1)
+        expect do
+          create_post(title, body)
+        end.to change { Post.count}.by(1)
+
+        expect(response).to have_http_status(:redirect)
       end
     end
 
     context "with invalid params" do
-      let(:title) { nil }
-      let(:body) { nil }
-
       it 'fails to create a post' do
-        post posts_path, params: params
-        expect(response.status).to eq 302
+        expect{ create_post("", "") }.not_to change { Post.count}
+        expect(Post.count).to eq(0)
+        expect(response).to have_http_status(:success)
       end
     end
   end
